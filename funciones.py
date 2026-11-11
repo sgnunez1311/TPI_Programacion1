@@ -1,5 +1,5 @@
 import csv
-
+#Usado para pedir un numero, comprobar que sea uno correcto y devolverlo
 def comprobar_num():
     numero = input()
     while not numero.isdigit():
@@ -7,13 +7,13 @@ def comprobar_num():
         numero = input("Intente de nuevo: ")
     numero = int(numero)
     return numero
-
+#Usado para comprobar una palabra, comprobar que sea correcta y devolverla
 def comprobar_palabra():
     palabra = input()
     while not palabra.isalpha:
         print("Error. Use solo letras.")
     return palabra
-
+#Usado para escribir los datos del csv dentro del programa y guarardarlos para futuras modificaciones
 def iniciar_csv():
     #creamos un diccionario vacio para guardar los paises en el csv
     paises = []
@@ -28,9 +28,9 @@ def iniciar_csv():
             paises.append(fila)
 
     return paises
-
-
+#Usado para agregar un pais nuevo
 def pais_nuevo():
+
     #Preguntamos los datos del nuevo pais
     print("Ingrese un pais para agregar: ")
     pais = comprobar_palabra()
@@ -54,4 +54,29 @@ def pais_nuevo():
     with open("paises.csv", "a", encoding="utf-8", newline="") as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=columnas)
         escritor.writerow(nuevo_pais)
+
+def modificar_pais(paises):
+    columnas = ["nombre", "poblacion", "superficie", "continente"]
+
+    buscar_pais = comprobar_palabra()
+
+    encontrado = False
+
+    for pais in paises:
+        if pais["nombre"].lower() == buscar_pais.lower():
+            encontrado = True
+
+            print("Ingrese la nueva poblacion: ")
+            pais["poblacion"] = comprobar_num()
+            print("Ingrese la nueva superficie: ")
+            pais["superficie"] = comprobar_num()
+
+    if encontrado:
+        with open ("paises.csv", "w", encoding="utf-8", newline="") as archivo:
+            escritor = csv.DictWriter(archivo, fieldnames=columnas)
+            escritor.writeheader()
+            escritor.writerows(paises)
+    else:
+        print("Pais no encontrado.")
+
 

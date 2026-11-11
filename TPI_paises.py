@@ -17,7 +17,7 @@ match opcion:
    case 1:
       funciones.pais_nuevo
    case 2:
-      print("")
+      funciones.modificar_pais(paises)
    case 3:
       print("")
    case 4:
