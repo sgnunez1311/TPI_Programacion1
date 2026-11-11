@@ -1,5 +1,6 @@
-import csv
 import funciones
+
+paises = funciones.iniciar_csv
 
 print("Menu:")
 print("1. Agregar un pais nuevo.")
@@ -9,11 +10,12 @@ print("4. Filtrar paises")
 print("5. Ordenar paises")
 print("6. Mostrar estadisticas")
 
-opcion = input("¿Que desea hacer? ")
+print("¿Que desea hacer? ")
+opcion = funciones.comprobar_num()
 
 match opcion:
    case 1:
-      print("")
+      funciones.pais_nuevo
    case 2:
       print("")
    case 3:
