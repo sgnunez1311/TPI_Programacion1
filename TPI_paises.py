@@ -10,7 +10,8 @@ while True:
    print("4. Filtrar paises")
    print("5. Ordenar paises")
    print("6. Mostrar estadisticas")
-   print("7. Salir")
+   print("7. Consultar un pais por API")
+   print("8. Salir")
 
    print("¿Que desea hacer? ")
    opcion = funciones.comprobar_num()
@@ -29,7 +30,9 @@ while True:
       case 6:
          funciones.estadisticas(paises)
       case 7:
+         funciones.pais_api(paises)
+      case 8:
          print("Saliendo...")
          break
       case _:
-         print("Error. Ingrese un numero del 1-7")
+         print("Error. Ingrese un numero del 1-8")

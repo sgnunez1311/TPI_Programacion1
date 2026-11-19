@@ -1,4 +1,10 @@
 import csv
+import json
+import unicodedata
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote
+from urllib.request import Request, urlopen
+
 #Usado para pedir un numero, comprobar que sea uno correcto y devolverlo
 def comprobar_num():
     while True:
@@ -56,10 +62,15 @@ def pais_nuevo(paises):
 
     #guardamos los datos en un diccionario
     nuevo_pais = {"nombre": pais, "poblacion": poblacion, "superficie": superficie, "continente": continente}
-    #Guardamos el nuevo pais en la lista de paises
-    paises.append(nuevo_pais)
+    guardar_pais_nuevo(paises, nuevo_pais)
+
+#Usado para agregar un pais (ingresado a mano o consultado por API) al csv
+def guardar_pais_nuevo(paises, nuevo_pais):
     #definimos las columnas
     columnas = ["nombre", "poblacion", "superficie", "continente"]
+
+    #Guardamos el nuevo pais en la lista de paises
+    paises.append(nuevo_pais)
 
     try:
         #Iniciamos el archivo en modo "a" para que se agregue la informacion y no borre todo
@@ -67,10 +78,12 @@ def pais_nuevo(paises):
             escritor = csv.DictWriter(archivo, fieldnames=columnas, lineterminator="\n")
             escritor.writerow(nuevo_pais)
         print(f"Se agrego exitosamente: {nuevo_pais}")
-    except OSError:
-        print("Error. Hubo un error en el sistema. Intente otra vez.")
+        return True
     except PermissionError:
         print("No tienes permiso para abrir este archivo.")
+    except OSError:
+        print("Error. Hubo un error en el sistema. Intente otra vez.")
+    return False
 #Usado para actualizar la poblacion y la superficie de un pais
 def modificar_pais(paises):
     columnas = ["nombre", "poblacion", "superficie", "continente"]
@@ -310,3 +323,191 @@ def estadisticas(paises):
             print(f"Asia tiene {asia} paises")
         case _:
             print("Opcion no encontrada. Elija un numero del 1-4.")
+
+#Nombres en español (sin tildes) que usa el csv para los paises mas comunes
+NOMBRES_API = {
+    "alemania": "Alemania",
+    "argentina": "Argentina",
+    "australia": "Australia",
+    "brasil": "Brasil",
+    "brazil": "Brasil",
+    "canada": "Canada",
+    "china": "China",
+    "corea del sur": "Corea del Sur",
+    "egipto": "Egipto",
+    "egypt": "Egipto",
+    "estados unidos": "Estados Unidos",
+    "francia": "Francia",
+    "france": "Francia",
+    "germany": "Alemania",
+    "india": "India",
+    "japon": "Japon",
+    "japan": "Japon",
+    "mexico": "Mexico",
+    "reino unido": "Reino Unido",
+    "south korea": "Corea del Sur",
+    "united kingdom": "Reino Unido",
+    "united states": "Estados Unidos"
+}
+
+#Nombres que espera la API cuando el usuario escribe el pais en español
+NOMBRES_CONSULTA = {
+    "alemania": "germany",
+    "brasil": "brazil",
+    "corea del sur": "south korea",
+    "egipto": "egypt",
+    "estados unidos": "united states",
+    "francia": "france",
+    "japon": "japan",
+    "reino unido": "united kingdom"
+}
+
+#La API devuelve los continentes en ingles y en plural; el csv usa los nombres en español
+CONTINENTES_API = {
+    "america": "America",
+    "americas": "America",
+    "africa": "Africa",
+    "asia": "Asia",
+    "europa": "Europa",
+    "europe": "Europa",
+    "oceania": "Oceania"
+}
+
+#Quita las tildes sin cambiar el resto del texto
+def sin_tildes(texto):
+    texto = unicodedata.normalize("NFD", str(texto))
+    return "".join(caracter for caracter in texto if unicodedata.category(caracter) != "Mn")
+
+#Deja un texto en minusculas y sin tildes para poder compararlo
+def normalizar_texto(texto):
+    return sin_tildes(texto).strip().lower()
+
+#Adapta la entrada del usuario a un nombre que la API pueda encontrar
+def nombre_para_consulta(nombre):
+    texto = normalizar_texto(nombre)
+    return NOMBRES_CONSULTA.get(texto, texto)
+
+#Devuelve el nombre con el formato que ya usa el csv (sin tildes)
+def nombre_para_csv(nombre):
+    texto = sin_tildes(nombre).strip()
+    return NOMBRES_API.get(normalizar_texto(texto), texto)
+
+#Comprueba si el pais ya esta en la lista, incluso si llega con otro nombre (Brazil/Brasil)
+def pais_existe(paises, nombre):
+    nombre_normalizado = normalizar_texto(nombre)
+    nombre_csv = NOMBRES_API.get(nombre_normalizado, nombre_normalizado)
+
+    for pais in paises or []:
+        existente = normalizar_texto(pais["nombre"])
+        if existente == nombre_normalizado:
+            return True
+        if NOMBRES_API.get(existente, existente) == nombre_csv:
+            return True
+    return False
+
+#Consulta la API y devuelve un diccionario con el formato del csv, o None si falla
+def consultar_api_pais(nombre):
+    url = "https://countries.dev/name/" + quote(nombre_para_consulta(nombre))
+    #La API rechaza peticiones sin User-Agent, por eso se indica explicitamente
+    peticion = Request(url, headers={"User-Agent": "TPI-paises/1.0", "Accept": "application/json"})
+
+    try:
+        with urlopen(peticion, timeout=10) as respuesta:
+            contenido = json.load(respuesta)
+    except HTTPError as error:
+        if error.code == 404:
+            print("Pais no encontrado.")
+        elif error.code in (401, 403):
+            print("Error de autorizacion con la API. Revise las credenciales.")
+        elif error.code == 429:
+            print("Error. Demasiadas consultas a la API. Intente mas tarde.")
+        else:
+            print(f"Error en la respuesta de la API. Codigo: {error.code}")
+        return None
+    except TimeoutError:
+        print("Error. La consulta a la API tardo demasiado. Intente otra vez.")
+        return None
+    except URLError:
+        print("Error de conexion con la API. Revise su conexion e intente otra vez.")
+        return None
+    except (ValueError, UnicodeDecodeError):
+        print("Error. La API devolvio una respuesta invalida.")
+        return None
+
+    #La API puede devolver una lista vacia cuando no hay coincidencias
+    if not isinstance(contenido, list) or not contenido:
+        print("Pais no encontrado.")
+        return None
+
+    datos = contenido[0]
+    try:
+        nombre_api = datos["name"]
+        poblacion = datos["population"]
+        superficie = datos["area"]
+        continente = datos["region"]
+    except (KeyError, TypeError):
+        print("Error. La API devolvio datos incompletos.")
+        return None
+
+    #No se guarda nada si falta algun dato o si no son numeros
+    try:
+        poblacion = str(int(poblacion))
+        superficie = str(int(superficie))
+    except (TypeError, ValueError):
+        print("Error. La API devolvio datos incompletos.")
+        return None
+
+    if not nombre_api or not continente:
+        print("Error. La API devolvio datos incompletos.")
+        return None
+
+    return {
+        "nombre": nombre_para_csv(nombre_api),
+        "poblacion": poblacion,
+        "superficie": superficie,
+        "continente": CONTINENTES_API.get(normalizar_texto(continente), sin_tildes(continente))
+    }
+
+#Muestra los datos del pais consultado
+def mostrar_pais_api(pais):
+    print("Datos del pais consultado:")
+    print(f"Nombre: {pais['nombre']}")
+    print(f"Poblacion: {pais['poblacion']}")
+    print(f"Superficie: {pais['superficie']}")
+    print(f"Continente: {pais['continente']}")
+
+#Pide una respuesta S/N y vuelve a preguntar si no es valida
+def comprobar_si_no():
+    while True:
+        respuesta = input().strip().upper()
+        if respuesta in ("S", "N"):
+            return respuesta
+        print("Error. Ingrese S o N.")
+
+#Consulta un pais por API y lo guarda solo si el usuario lo confirma
+def pais_api(paises):
+    try:
+        print("Ingrese el nombre del pais a consultar: ")
+        nombre = input().strip()
+        if not nombre:
+            print("Error. Ingrese un nombre de pais.")
+            return
+
+        pais = consultar_api_pais(nombre)
+        if pais is None:
+            return
+
+        mostrar_pais_api(pais)
+
+        #Evita agregar dos veces el mismo pais, aunque venga con otro nombre
+        if pais_existe(paises, pais["nombre"]):
+            print("El pais ya existe en el archivo CSV. No se agrego ningun registro.")
+            return
+
+        print("¿Desea agregar este pais al archivo CSV? (S/N)")
+        if comprobar_si_no() == "S":
+            guardar_pais_nuevo(paises, pais)
+        else:
+            print("No se guardo ningun dato.")
+    except Exception as error:
+        print(f"Error inesperado al consultar la API: {error}")
