@@ -1,7 +1,7 @@
 # TPI_Programacion1
----------------------------
-Explicacion del programa:
 
+Explicacion del programa:
+---------------------------
 Es una aplicación de consola para gestionar un catálogo de países guardado en paises.csv. El archivo CSV funciona como base de datos y tiene cuatro
 columnas:
 
@@ -20,9 +20,9 @@ Se repite hasta que el usuario elige salir.
 funciones.py: Contiene toda la lógica: validación de entradas, lectura/escritura del CSV, alta, modificación, búsqueda, filtros, orden y estadísticas.
 
 paises.csv: Persistencia de los datos. Se lee al inicio y se sobrescribe al modificar o se agrega una fila al dar de alta.
----------------------------
-Instrucciones de uso: 
 
+Instrucciones de uso: 
+---------------------------
 1 — Agregar: pide nombre, población, superficie y continente. Agrega una fila al final del CSV (modo "a"). No confirma por pantalla.
 
 2 — Actualizar: pide el nombre, y si lo encuentra, reemplaza población y superficie (nombre y continente no se cambian). Reescribe todo el CSV con su cabecera.
@@ -40,7 +40,7 @@ Instrucciones de uso:
 Nota sobre la entrada: Los países y continentes del CSV están sin tildes (Japon, America, Africa, Oceania). Conviene escribirlos así.
 
 Ejemplos de entradas y salida:
-
+---------------------------
 Ejemplo 1: buscar un país (opción 3)
 
 ¿Que desea hacer? 3
