@@ -17,7 +17,7 @@ while True:
 
    match opcion:
       case 1:
-         funciones.pais_nuevo()
+         funciones.pais_nuevo(paises)
       case 2:
          funciones.modificar_pais(paises)
       case 3:

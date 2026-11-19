@@ -10,7 +10,7 @@ def comprobar_num():
 #Usado para comprobar una palabra, comprobar que sea correcta y devolverla
 def comprobar_palabra():
     palabra = input()
-    while not palabra.isalpha:
+    while not palabra.isalpha():
         print("Error. Use solo letras.")
     return palabra
 #Usado para escribir los datos del csv dentro del programa y guarardarlos para futuras modificaciones
@@ -29,7 +29,7 @@ def iniciar_csv():
 
     return paises
 #Usado para agregar un pais nuevo
-def pais_nuevo():
+def pais_nuevo(paises):
 
     #Preguntamos los datos del nuevo pais
     print("Ingrese un pais para agregar: ")
@@ -46,7 +46,8 @@ def pais_nuevo():
 
     #guardamos los datos en un diccionario
     nuevo_pais = {"nombre": pais, "poblacion": poblacion, "superficie": superficie, "continente": continente}
-
+    #Guardamos el nuevo pais en la lista de paises
+    paises.append(nuevo_pais)
     #definimos las columnas
     columnas = ["nombre", "poblacion", "superficie", "continente"]
 
@@ -54,6 +55,7 @@ def pais_nuevo():
     with open("paises.csv", "a", encoding="utf-8", newline="") as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=columnas, lineterminator="\n")
         escritor.writerow(nuevo_pais)
+    print(f"Se agrego exitosamente: {nuevo_pais}")
 #Usado para actualizar la poblacion y la superficie de un pais
 def modificar_pais(paises):
     columnas = ["nombre", "poblacion", "superficie", "continente"]
@@ -76,6 +78,7 @@ def modificar_pais(paises):
             escritor = csv.DictWriter(archivo, fieldnames=columnas)
             escritor.writeheader()
             escritor.writerows(paises)
+            print(f"Ha sido modificado con exito: {pais}")
     else:
         print("Pais no encontrado.")
 #Busca un pais y lo muestra
@@ -134,7 +137,7 @@ def filtrar_paises(paises):
                     print(pais)
         case _:
             print("Error. Ingrese una opcion del 1 al 3")
-
+#Ordena los paises de diferentes maneras.
 def ordenar_paises(paises):
     print("1. Ordenar por nombre.")
     print("2. Ordenar por poblacion.")
@@ -171,7 +174,7 @@ def ordenar_paises(paises):
                 print(pais)
         case _:
             print("Error. Ingrese una opcion del 1 al 3")
-
+#Muestra las estadisticas de los paises segun condiciones.
 def estadisticas(paises):
     print("1. Pais con mayor y menor poblacion.")
     print("2. Promedio de poblacion.")
