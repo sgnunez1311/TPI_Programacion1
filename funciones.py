@@ -1,36 +1,46 @@
 import csv
 #Usado para pedir un numero, comprobar que sea uno correcto y devolverlo
 def comprobar_num():
-    numero = input()
-    while not numero.isdigit():
-        print("Error, ingrese un numero entero.")
-        numero = input("Intente de nuevo: ")
-    numero = int(numero)
-    return numero
+    while True:
+        try:
+            numero = int(input())
+            if numero > 0:
+                return numero
+            else:
+                print("Error. Ingrese un numero entero positivo.")
+        except ValueError:
+            print("Error. Ingrese un numero entero positivo.")
 #Usado para comprobar una palabra, comprobar que sea correcta y devolverla
 def comprobar_palabra():
-    palabra = input()
-    while not palabra.isalpha():
-        print("Error. Use solo letras.")
-    return palabra
+    while True:
+        palabra = input()
+        if palabra.isalpha():
+            return palabra
+        else:
+            print("Error. Ingrese una palabra usando letras.")
 #Usado para escribir los datos del csv dentro del programa y guarardarlos para futuras modificaciones
 def iniciar_csv():
-    #creamos un diccionario vacio para guardar los paises en el csv
+    #creamos una lista vacia para guardar los paises en diccionarios del csv
     paises = []
 
     #Abrimos el archivo para leer la informacion que ya contiene
-    with open("paises.csv", "r", encoding="utf-8", newline="") as archivo:
-        #guardamos la informacion en una variable
-        lector = csv.DictReader(archivo)
-        #leemos diccionario por diccionario y lo guardamos en la variable "fila"
-        for fila in lector:
-        #Agregamos cada diccionario por separado a la lista "paises"
-            paises.append(fila)
-
-    return paises
+    try:
+        with open("paises.csv", "r", encoding="utf-8", newline="") as archivo:
+            #guardamos la informacion en una variable
+            lector = csv.DictReader(archivo)
+            #leemos diccionario por diccionario y lo guardamos en la variable "fila"
+            for fila in lector:
+            #Agregamos cada diccionario por separado a la lista "paises"
+                paises.append(fila)
+            return paises
+    except FileNotFoundError:
+        print("Error. El archivo no se encontró.")
+    except PermissionError:
+        print("No tienes permiso para abrir este archivo.")
+    except OSError:
+        print("Error. Hubo un error en el sistema. Intente otra vez.")
 #Usado para agregar un pais nuevo
 def pais_nuevo(paises):
-
     #Preguntamos los datos del nuevo pais
     print("Ingrese un pais para agregar: ")
     pais = comprobar_palabra()
@@ -51,11 +61,16 @@ def pais_nuevo(paises):
     #definimos las columnas
     columnas = ["nombre", "poblacion", "superficie", "continente"]
 
-    #Iniciamos el archivo en modo "a" para que se agregue la informacion y no borre todo
-    with open("paises.csv", "a", encoding="utf-8", newline="") as archivo:
-        escritor = csv.DictWriter(archivo, fieldnames=columnas, lineterminator="\n")
-        escritor.writerow(nuevo_pais)
-    print(f"Se agrego exitosamente: {nuevo_pais}")
+    try:
+        #Iniciamos el archivo en modo "a" para que se agregue la informacion y no borre todo
+        with open("paises.csv", "a", encoding="utf-8", newline="") as archivo:
+            escritor = csv.DictWriter(archivo, fieldnames=columnas, lineterminator="\n")
+            escritor.writerow(nuevo_pais)
+        print(f"Se agrego exitosamente: {nuevo_pais}")
+    except OSError:
+        print("Error. Hubo un error en el sistema. Intente otra vez.")
+    except PermissionError:
+        print("No tienes permiso para abrir este archivo.")
 #Usado para actualizar la poblacion y la superficie de un pais
 def modificar_pais(paises):
     columnas = ["nombre", "poblacion", "superficie", "continente"]
@@ -74,28 +89,41 @@ def modificar_pais(paises):
             pais["superficie"] = comprobar_num()
 
     if encontrado:
-        with open ("paises.csv", "w", encoding="utf-8", newline="") as archivo:
-            escritor = csv.DictWriter(archivo, fieldnames=columnas)
-            escritor.writeheader()
-            escritor.writerows(paises)
-            print(f"Ha sido modificado con exito: {pais}")
+        try:
+            with open ("paises.csv", "w", encoding="utf-8", newline="") as archivo:
+                escritor = csv.DictWriter(archivo, fieldnames=columnas)
+                escritor.writeheader()
+                escritor.writerows(paises)
+                print(f"Ha sido modificado con exito: {pais}")
+        except FileNotFoundError:
+            print("Error. El archivo no se encontró.")
+        except PermissionError:
+            print("No tienes permiso para abrir este archivo.")
+        except OSError:
+            print("Error. Hubo un error en el sistema. Intente otra vez.")
     else:
         print("Pais no encontrado.")
 #Busca un pais y lo muestra
 def buscar_pais():
     print("Ingrese un pais a buscar: ")
     buscar = comprobar_palabra()
-    with open("paises.csv","r", encoding="utf-8", newline="") as archivo:
+    try:
+        with open("paises.csv","r", encoding="utf-8", newline="") as archivo:
+            lector = csv.DictReader(archivo)
 
-        lector = csv.DictReader(archivo)
-
-        encontrado = False
-        for pais in lector:
-            if buscar.lower() in pais["nombre"].lower():
-                print(pais)
-                encontrado = True
-        if encontrado == False:
-            print("Pais no encontrado.")
+            encontrado = False
+            for pais in lector:
+                if buscar.lower() in pais["nombre"].lower():
+                    print(pais)
+                    encontrado = True
+            if encontrado == False:
+                print("Pais no encontrado.")
+    except FileNotFoundError:
+        print("Error. El archivo no se encontró.")
+    except PermissionError:
+        print("No tienes permiso para abrir este archivo.")
+    except OSError:
+        print("Error. Hubo un error en el sistema. Intente otra vez.")
 #Abre un menu para filtrar paises con diferentes condiciones
 def filtrar_paises(paises):
     print("1. Filtrar por continente.")
@@ -191,49 +219,71 @@ def estadisticas(paises):
             menor = int(paises[0]["poblacion"])
             
             pais_menor = ""
-            with open("paises.csv", "r", encoding="utf-8", newline="") as archivo:
+            try:
+                with open("paises.csv", "r", encoding="utf-8", newline="") as archivo:
 
-                lector = csv.DictReader(archivo)
+                    lector = csv.DictReader(archivo)
 
-                for fila in lector:
-                    if int(fila["poblacion"]) > mayor:
-                        mayor = int(fila["poblacion"])
-                        pais_mayor = fila["nombre"]
-                    if int(fila["poblacion"]) < menor:
-                        menor = int(fila["poblacion"])
-                        pais_menor = fila["nombre"]
-                print(f"El pais con mayor poblacion es: {pais_mayor} con: {mayor}")
-                print(f"El pais con menor poblacion es: {pais_menor} con: {menor}")
+                    for fila in lector:
+                        if int(fila["poblacion"]) > mayor:
+                            mayor = int(fila["poblacion"])
+                            pais_mayor = fila["nombre"]
+                        if int(fila["poblacion"]) < menor:
+                            menor = int(fila["poblacion"])
+                            pais_menor = fila["nombre"]
+                    print(f"El pais con mayor poblacion es: {pais_mayor} con: {mayor}")
+                    print(f"El pais con menor poblacion es: {pais_menor} con: {menor}")
+
+            except FileNotFoundError:
+                print("Error. El archivo no se encontró.")
+            except PermissionError:
+                print("No tienes permiso para abrir este archivo.")
+            except OSError:
+                print("Error. Hubo un error en el sistema. Intente otra vez.")
 
         case 2:
             suma = 0
             promedio = 0
             cantidad = len(paises)
+            try:
+                with open("paises.csv", "r", encoding="utf-8", newline="") as archivo:
 
-            with open("paises.csv", "r", encoding="utf-8", newline="") as archivo:
+                    lector = csv.DictReader(archivo)
 
-                lector = csv.DictReader(archivo)
+                    for fila in lector:
+                        suma += int(fila["poblacion"])
+                    promedio = suma / cantidad
+                    promedio = round(promedio, 2)
+                    print("El promedio de poblacion en todos los paises es de:",promedio)
 
-                for fila in lector:
-                    suma += int(fila["poblacion"])
-                promedio = suma / cantidad
-                promedio = round(promedio, 2)
-                print("El promedio de poblacion en todos los paises es de:",promedio)
+            except FileNotFoundError:
+                print("Error. El archivo no se encontró.")
+            except PermissionError:
+                print("No tienes permiso para abrir este archivo.")
+            except OSError:
+                print("Error. Hubo un error en el sistema. Intente otra vez.")
 
         case 3:
             suma = 0
             promedio = 0
             cantidad = len(paises)
+            try:
+                with open("paises.csv", "r", encoding="utf-8", newline="") as archivo:
 
-            with open("paises.csv", "r", encoding="utf-8", newline="") as archivo:
+                    lector = csv.DictReader(archivo)
 
-                lector = csv.DictReader(archivo)
+                    for fila in lector:
+                        suma += int(fila["superficie"])
+                    promedio = suma / cantidad
+                    promedio = round(promedio, 2)
+                    print("El promedio de superficie en todos los paises es de:",promedio)
 
-                for fila in lector:
-                    suma += int(fila["superficie"])
-                promedio = suma / cantidad
-                promedio = round(promedio, 2)
-                print("El promedio de superficie en todos los paises es de:",promedio)
+            except FileNotFoundError:
+                print("Error. El archivo no se encontró.")
+            except PermissionError:
+                print("No tienes permiso para abrir este archivo.")
+            except OSError:
+                print("Error. Hubo un error en el sistema. Intente otra vez.")
 
         case 4:
             america = 0
@@ -258,3 +308,5 @@ def estadisticas(paises):
             print(f"Oceania tiene {oceania} paises")
             print(f"Europa tiene {europa} paises")
             print(f"Asia tiene {asia} paises")
+        case _:
+            print("Opcion no encontrada. Elija un numero del 1-4.")

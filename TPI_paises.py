@@ -31,3 +31,5 @@ while True:
       case 7:
          print("Saliendo...")
          break
+      case _:
+         print("Error. Ingrese un numero del 1-7")
