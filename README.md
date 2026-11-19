@@ -42,7 +42,7 @@ Nota sobre la entrada: Los países y continentes del CSV están sin tildes (Japo
 Ejemplos de entradas y salida:
 ---------------------------
 Ejemplo 1: buscar un país (opción 3)
-
+---------------------------
 ¿Que desea hacer? 3
 
 Ingrese un pais a buscar:
@@ -52,7 +52,7 @@ arg
 
 
 Ejemplo 2: filtrar por continente (opción 4 → 1)
-
+---------------------------
 ¿Que desea hacer? 4
 
 1. Filtrar por continente.
@@ -70,7 +70,7 @@ america
 
 
 Ejemplo 3: filtrar por rango de población (opción 4 → 2)
-
+---------------------------
 ¿Que desea hacer? 4
 1. Filtrar por continente.
 2. Rango de poblacion.
@@ -91,7 +91,7 @@ Ingrese el numero menor del rango
 
 
 Ejemplo 4: ordenar por población (opción 5 → 2)
-
+---------------------------
 ¿Que desea hacer? 5
 1. Ordenar por nombre.
 2. Ordenar por poblacion.
@@ -112,7 +112,7 @@ Ejemplo 4: ordenar por población (opción 5 → 2)
 
 
 Ejemplo 5: estadísticas (opción 6 → 1 y → 2)
-
+---------------------------
 ¿Que desea hacer? 6
 1. Pais con mayor y menor poblacion.
 2. Promedio de poblacion.
@@ -132,7 +132,7 @@ El promedio de poblacion en todos los paises es de: 230156490.8
 
 
 Ejemplo 6: agregar un país (opción 1)
-
+---------------------------
 ¿Que desea hacer? 1
 Ingrese un pais para agregar:
 Chile
@@ -150,7 +150,7 @@ Se agrego exitosamente: Chile,19000000,756096,America
 
 
 Ejemplo 7: actualizar un país (opción 2)
-
+---------------------------
 ¿Que desea hacer? 2
 
 ¿Que pais desea modificar?
@@ -166,9 +166,9 @@ Ha sido modificado con exito: Japon,126000000,378000,Asia
 
 Si el nombre no se encuentra, imprime: Pais no encontrado.
 
----------------------------
-Participacion de los integrantes:
 
+Participacion de los integrantes:
+---------------------------
 Santino: Crear la logica de los archivos funciones.py, TPI_paises.py  y organizar el archivo paises.csv. Tambien toda la informacion en README.md y comentar el codigo.
 
 Juan: Crear la documentación Académica y Técnica con la informacion de todos los conceptos usados en el programa y de agregarle la API.
