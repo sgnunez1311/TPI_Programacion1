@@ -174,3 +174,7 @@ Santino: Crear la logica de los archivos funciones.py, TPI_paises.py  y organiza
 Juan: Crear la documentación Académica y Técnica con la informacion de todos los conceptos usados en el programa y de agregarle la API.
 
 Dionel: Encargado de la robustez del codigo, asegurando el correcto funcionamiento del mismo y manejando eficientemente los errores y comentar el codigo.
+
+Link del video:
+---------------------------
+https://www.youtube.com/watch?v=kwjw9mwGDlU
